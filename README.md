@@ -11,8 +11,6 @@ The framework finds the lightest layout of an axisymmetric part made by Fused Fi
 
 The full formulation, assumptions and discussion are in the thesis: [`docs/TO_Final_Inform_FLP.pdf`](docs/TO_Final_Inform_FLP.pdf).
 
-> **Status:** the repository is being completed. `material_characterization.ipynb` and `experimental_compression.ipynb` are final. `Final.ipynb` is stored without outputs, and the results of Blocks 5 to 10 (designs, sector STL files, virtual tests, verification and thesis figures) will be added once the definitive run ends. Until then, run it with `RUN_SEARCHES = True` and `RUN_VIRTUAL_TEST = True`.
-
 ## Main results
 
 Calculated masses of the selected designs, for the assumed loads and supports. All of them are lightest feasible designs found, not proven global optima.
@@ -109,9 +107,43 @@ RUN_SEARCHES = True        # The 103 SIMP runs of Blocks 5 and 6
 RUN_VIRTUAL_TEST = True    # The 12 virtual tests of Block 8
 ```
 
-The thesis records 36.2 min for the searches of Block 5 and 150.7 min for those of Block 6. Block 8 took 22.4 min. These are recorded times on the computer used, not a hardware-independent benchmark.
+| Step | Thesis | Run stored here |
+|---|---:|---:|
+| Searches of Block 5 | 36.2 min | 20.5 min |
+| Searches of Block 6 | 150.7 min | 130.7 min |
+| Virtual tests of Block 8 | 22.4 min | 15.0 min |
+
+These are recorded times on the computers used, not a hardware-independent benchmark.
 
 `pypardiso` provides the Intel PARDISO solver and is the solver used for the stored results. Without it, the notebook falls back to SuperLU, which is slower. The problem is non-convex and each run starts from the previous one, so round-off differences between solvers or library versions could change the search path. The last cell of `Final.ipynb` compares each run with the thesis and writes the outcome to `results/report_check.csv`.
+
+### What the stored results contain
+
+| Folder | Produced by | Contents |
+|---|---|---|
+| `results/characterization/` | `material_characterization.ipynb` | Stress-strain figures, specimen and batch tables, material constants |
+| `results/benchmark/` | Blocks 3 and 4 | Fixed-volume benchmark: figures and metrics |
+| `results/designs/` | Blocks 5 and 6 | `designs.npz` with the binary design of all 103 runs, `search_history.json` with their metrics, `search_log.txt` with the log of the run |
+| `results/searches/` | Blocks 5 and 6 | Mass against utilization for each search, cross-utilization |
+| `results/stl/sectors/` | Block 7 | The ten closed 7.5° sectors, named `{material}_{design}_vf{volume fraction}_sec7p5.stl` |
+| `results/virtual_test/` | Block 8 | Force-displacement curve and figure of the twelve virtual tests, summary table |
+| `results/verification/` | Block 9 | Tables T01 to T09, figures F01 and F02 |
+| `results/thesis_figures/` | Block 10 | Figures F10_xx by topic, tables T10_xx as CSV, Markdown and LaTeX, and `figure_captions.md` |
+| `results/sector_tests/` | `experimental_compression.ipynb` | Figures F_EXP_xx, tables T_EXP_xx, Table 5.13.1 |
+| `results/report_check.csv` | Block 10 | Each compared value: computed, printed in the thesis, and whether they agree |
+
+[`docs/report_traceability.md`](docs/report_traceability.md) maps each figure and table of the thesis to the notebook and file that produce it.
+
+### How the stored run was verified
+
+All the searches and virtual tests were run again from scratch with this consolidated code, and the results were compared with the run behind the thesis:
+
+- `results/report_check.csv` agrees with the thesis in all 115 compared values.
+- Tables T01 to T05 and T07 to T10 match the original run, except for the computing times. The original run also has an `E_z alternative` set in T06, from an earlier version of the material catalog, which the thesis does not use and this code does not compute. The other 48 rows of T06 match.
+- The ten sector STL files have the same number of triangles and the same volume as the originals.
+- Block 9 re-evaluates all the design and load case pairs independently, and differs from the values stored by the searches by at most 7.85e-11 in relative terms.
+
+These checks show that the code reproduces the numbers of the thesis. They do not validate the assumed loads and supports or the material model, whose limitations are discussed in Sections 1.7, 4.8 and 5.13 of the thesis.
 
 ### Applying the framework to another part
 
