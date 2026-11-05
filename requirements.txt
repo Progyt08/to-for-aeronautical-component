@@ -1,0 +1,10 @@
+# Versions used for the stored results (Python 3.11)
+numpy==2.4.6
+scipy==1.17.1
+matplotlib==3.11.1
+pandas==3.0.6
+scikit-image==0.26.0
+numpy-stl==4.1.1
+mapbox-earcut==2.1.0
+pypardiso==0.4.7
+jupyter==1.1.1
