@@ -82,11 +82,11 @@ For PA6, the tests preserved the predicted stiffness order of the five designs b
 
 ## The notebooks
 
-| Notebook | Purpose | Thesis | View |
-|---|---|---|---|
-| [`material_characterization.ipynb`](notebooks/material_characterization.ipynb) | Coupon tests and material constants | Sec. 4.3, 4.4 | [nbviewer](https://nbviewer.org/github/Progyt08/to-for-aeronautical-component/blob/main/notebooks/material_characterization.ipynb) |
-| [`Final.ipynb`](notebooks/Final.ipynb) | The framework, in ten blocks | Chapter 3, Sec. 5.1 to 5.12 | [nbviewer](https://nbviewer.org/github/Progyt08/to-for-aeronautical-component/blob/main/notebooks/Final.ipynb) |
-| [`experimental_compression.ipynb`](notebooks/experimental_compression.ipynb) | Tests of the printed sectors | Sec. 4.7, 5.13 | [nbviewer](https://nbviewer.org/github/Progyt08/to-for-aeronautical-component/blob/main/notebooks/experimental_compression.ipynb) |
+| Notebook | Purpose | Thesis |
+|---|---|---|
+| [`material_characterization.ipynb`](notebooks/material_characterization.ipynb) | Coupon tests and material constants | Sec. 4.3, 4.4 |
+| [`Final.ipynb`](notebooks/Final.ipynb) | The framework, in ten blocks | Chapter 3, Sec. 5.1 to 5.12 |
+| [`experimental_compression.ipynb`](notebooks/experimental_compression.ipynb) | Tests of the printed sectors | Sec. 4.7, 5.13 |
 
 All three are stored with their outputs. The blocks of `Final.ipynb` share their state in memory and must run in order:
 
