@@ -1,15 +1,32 @@
+<div align="center">
+
 # Topology Optimization Framework for Solids of Revolution
 
-Code and data of the undergraduate thesis *Topological Structural Optimization Framework for Solids of Revolution Applied to an Aeronautical Component*, Engineering Physics, EAFIT University, 2026. Author: Fernando Londoño Palacio. Advisor: Ph.D. Ronald Mauricio Martinod Restrepo.
+**Minimum-mass design of an axisymmetric aeronautical component made by Fused Filament Fabrication**
 
-The framework finds the lightest layout of an axisymmetric part made by Fused Filament Fabrication (FFF), keeping its displacements within the drawing tolerances and its von Mises stress within a safety factor of 1.5 under four static load cases. It combines:
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](requirements.txt)
+[![Jupyter notebooks](https://img.shields.io/badge/Notebooks-3-F37626?logo=jupyter&logoColor=white)](#the-notebooks)
+[![Thesis PDF](https://img.shields.io/badge/Thesis-PDF-B31B1B)](docs/TO_Final_Inform_FLP.pdf)
+[![MIT License](https://img.shields.io/badge/License-MIT-2E7D32)](LICENSE)
+
+<img src="docs/images/banner.png" alt="Half-section views of the original solid and of the PA6 and PA6-CF multi-load designs, showing their internal topology" width="100%">
+
+</div>
+
+Code and data of the undergraduate thesis *Topological Structural Optimization Framework for Solids of Revolution Applied to an Aeronautical Component*, Engineering Physics, EAFIT University, 2026.
+
+**Author:** Fernando Londoño Palacio | **Advisor:** Ph.D. Ronald Mauricio Martinod Restrepo
+
+## Overview
+
+The framework finds the lightest layout of an axisymmetric part, keeping its displacements within the drawing tolerances and its von Mises stress within a safety factor of 1.5 under four static load cases. It combines:
 
 - an axisymmetric SIMP implementation in Python, with an axisymmetric Helmholtz filter and a volume constraint weighted by the volume of revolution of each element;
 - a transversely isotropic material model, with moduli measured on printed coupons of PA6 and PA6-CF;
 - a minimum-mass search on the volume fraction, with displacement and stress limits checked on each binary design;
 - closed STL export of rings and test sectors, a virtual compression test and an independent verification.
 
-The full formulation, assumptions and discussion are in the thesis: [`docs/TO_Final_Inform_FLP.pdf`](docs/TO_Final_Inform_FLP.pdf).
+The formulation, assumptions and discussion are in the [thesis](docs/TO_Final_Inform_FLP.pdf).
 
 ## Main results
 
@@ -26,53 +43,52 @@ Calculated masses of the selected designs, for the assumed loads and supports. A
 
 Each single-case design violates the limits of the other three cases, so the component needs the multi-load formulation.
 
-Nine full-scale 7.5° sectors were tested in compression. For PA6, the tests preserved the predicted stiffness order of the five designs but measured a mean of 3.54 times the predicted stiffness. For PA6-CF, the predicted order was not preserved, and moisture in the filament prevented printing the multi-load sector. The absolute stiffness and the PA6-CF design ranking therefore remain unvalidated (Sections 5.13 and 6 of the thesis).
+![Meridian sections of the ten selected designs, with their volume fraction, mass, saving and utilization](results/thesis_figures/04_designs/F10_04_topology_gallery.png)
 
-## Repository structure
+## From the coupons to the printed sectors
 
-```text
-to-for-aeronautical-component/
-├── notebooks/
-│   ├── material_characterization.ipynb   Coupon tests and material constants (Sec. 4.3, 4.4)
-│   ├── Final.ipynb                       The framework, in ten blocks (Chapter 3, Sec. 5.1 to 5.12)
-│   └── experimental_compression.ipynb    Tests of the printed sectors (Sec. 4.7, 5.13)
-├── data/
-│   ├── geometry/Solido_half.stl          CAD of one 180-degree half of the component
-│   ├── characterization/                 20 raw records: {PA6,PA6CF}_{1..5}_{T,C}.txt
-│   └── sector_tests/                     9 raw records: PA6TO_*.csv, PA6CFTO_*.csv
-├── results/
-│   ├── report_check.csv                  Results of Final.ipynb against the values printed in the thesis
-│   ├── characterization/                 Specimen and batch tables, material constants, figures
-│   ├── benchmark/                        Blocks 3 and 4
-│   ├── designs/                          Blocks 5 and 6: binary designs, history of the runs, log
-│   ├── searches/                         Blocks 5 and 6: figures
-│   ├── stl/sectors/                      Block 7: the 7.5-degree sectors, ready to print
-│   ├── virtual_test/                     Block 8: curves and tables
-│   ├── verification/                     Block 9: tables T01 to T09, figures F01 and F02
-│   ├── thesis_figures/                   Block 10: figures F10_xx, tables T10_xx
-│   └── sector_tests/                     Figures F_EXP_xx, tables T_EXP_xx
-├── docs/
-│   ├── TO_Final_Inform_FLP.pdf           The thesis
-│   ├── report_traceability.md            Where each figure and table of the thesis comes from
-│   ├── component_cad.png
-│   └── photos/                           Printer, specimens, test setup and tested sectors
-├── requirements.txt
-└── LICENSE
+```mermaid
+flowchart LR
+    A["Coupon tests<br/>PA6 and PA6-CF"] --> B["Material constants<br/>transverse isotropy"]
+    G["Component CAD"] --> C["Meridian section<br/>Q4 mesh"]
+    B --> D
+    C --> D["SIMP with axisymmetric<br/>filter and projection"]
+    D --> E["Search on the volume<br/>fraction, U ≤ 1"]
+    E --> F["Binary designs<br/>and closed STL files"]
+    F --> H["Virtual compression<br/>test"]
+    F --> I["Printed 7.5° sectors<br/>and compression tests"]
+    H --> J["Measured against<br/>predicted response"]
+    I --> J
 ```
 
-The 360-degree rings (249 MB) and the benchmark STL files are not stored in git. `Final.ipynb` writes them to `results/stl/rings/` and `results/stl/benchmark/`.
+The problem has four load cases, each with its own pressures. The outer wall is clamped, the base slides, and the critical walls have a tighter displacement limit (0.1 mm) than the rest of the contour (0.5 mm).
 
-## How the notebooks connect
+![Supports and loads of the four cases on the meridian section](results/thesis_figures/01_load_cases/F10_01_load_cases_overview.png)
 
-```text
-data/characterization/ --> material_characterization.ipynb --> constants of Table 4.4.1
-                                                                    |
-data/geometry/Solido_half.stl ------------------------------> Final.ipynb --> designs, STL files, predictions
-                                                                                     |
-data/sector_tests/ ------------------------------------> experimental_compression.ipynb --> measured vs. predicted
-```
+## Experimental tests
 
-The blocks of `Final.ipynb` share their state in memory and must run in order:
+Nine full-scale 7.5° sectors were printed and tested in compression.
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/photos/setup_to.jpeg" alt="A printed sector between the compression platens" height="320"><br><sub>Test setup</sub></td>
+    <td align="center"><img src="docs/photos/seccions.jpeg" alt="The nine printed sectors" height="320"><br><sub>The nine printed sectors</sub></td>
+  </tr>
+</table>
+
+![Measured force against corrected displacement for the PA6 and PA6-CF sectors](results/sector_tests/F_EXP_01_curves_corrected.png)
+
+For PA6, the tests preserved the predicted stiffness order of the five designs but measured a mean of 3.54 times the predicted stiffness. For PA6-CF, the predicted order was not preserved, and moisture in the filament prevented printing the multi-load sector. The absolute stiffness and the PA6-CF design ranking therefore remain unvalidated (Sections 5.13 and 6 of the thesis).
+
+## The notebooks
+
+| Notebook | Purpose | Thesis | View |
+|---|---|---|---|
+| [`material_characterization.ipynb`](notebooks/material_characterization.ipynb) | Coupon tests and material constants | Sec. 4.3, 4.4 | [nbviewer](https://nbviewer.org/github/Progyt08/to-for-aeronautical-component/blob/main/notebooks/material_characterization.ipynb) |
+| [`Final.ipynb`](notebooks/Final.ipynb) | The framework, in ten blocks | Chapter 3, Sec. 5.1 to 5.12 | [nbviewer](https://nbviewer.org/github/Progyt08/to-for-aeronautical-component/blob/main/notebooks/Final.ipynb) |
+| [`experimental_compression.ipynb`](notebooks/experimental_compression.ipynb) | Tests of the printed sectors | Sec. 4.7, 5.13 | [nbviewer](https://nbviewer.org/github/Progyt08/to-for-aeronautical-component/blob/main/notebooks/experimental_compression.ipynb) |
+
+All three are stored with their outputs. The blocks of `Final.ipynb` share their state in memory and must run in order:
 
 | Block | Purpose | Thesis |
 |---|---|---|
@@ -87,6 +103,30 @@ The blocks of `Final.ipynb` share their state in memory and must run in order:
 | 9 | Independent verification | Sec. 3.9, 5.1, 5.2, 5.9, 5.10 |
 | 10 | Thesis figures and tables, and check against the thesis | Sec. 3.9, Chapter 5 |
 
+## Repository structure
+
+```text
+to-for-aeronautical-component/
+├── notebooks/      The three notebooks above
+├── data/           CAD geometry and raw test records (see data/README.md)
+├── results/        Everything the notebooks produce (see results/README.md)
+│   ├── stl/sectors/        The ten 7.5-degree sectors, ready to print
+│   ├── designs/            Binary designs and history of the 103 runs
+│   ├── virtual_test/       Block 8: curves and tables
+│   ├── verification/       Block 9: tables T01 to T09
+│   ├── thesis_figures/     Block 10: figures F10_xx, tables T10_xx
+│   └── sector_tests/       Experimental figures and tables
+├── docs/
+│   ├── TO_Final_Inform_FLP.pdf     The thesis
+│   ├── report_traceability.md      Where each figure and table of the thesis comes from
+│   └── photos/                     Printer, specimens, test setup and tested sectors
+├── requirements.txt
+├── CITATION.cff
+└── LICENSE
+```
+
+The 360-degree rings (249 MB) and the benchmark STL files are not stored in git. `Final.ipynb` writes them to `results/stl/rings/` and `results/stl/benchmark/`.
+
 ## Getting started
 
 The code was run with Python 3.11 on Windows.
@@ -97,8 +137,6 @@ source .venv/Scripts/activate
 pip install -r requirements.txt
 jupyter lab notebooks/
 ```
-
-### Reproducing the results
 
 By default `Final.ipynb` loads the stored designs and virtual tests, and everything else runs in about 15 minutes. To regenerate them from scratch, change the flags of its first code cell:
 
@@ -117,24 +155,7 @@ These are recorded times on the computers used, not a hardware-independent bench
 
 `pypardiso` provides the Intel PARDISO solver and is the solver used for the stored results. Without it, the notebook falls back to SuperLU, which is slower. The problem is non-convex and each run starts from the previous one, so round-off differences between solvers or library versions could change the search path. The last cell of `Final.ipynb` compares each run with the thesis and writes the outcome to `results/report_check.csv`.
 
-### What the stored results contain
-
-| Folder | Produced by | Contents |
-|---|---|---|
-| `results/characterization/` | `material_characterization.ipynb` | Stress-strain figures, specimen and batch tables, material constants |
-| `results/benchmark/` | Blocks 3 and 4 | Fixed-volume benchmark: figures and metrics |
-| `results/designs/` | Blocks 5 and 6 | `designs.npz` with the binary design of all 103 runs, `search_history.json` with their metrics, `search_log.txt` with the log of the run |
-| `results/searches/` | Blocks 5 and 6 | Mass against utilization for each search, cross-utilization |
-| `results/stl/sectors/` | Block 7 | The ten closed 7.5° sectors, named `{material}_{design}_vf{volume fraction}_sec7p5.stl` |
-| `results/virtual_test/` | Block 8 | Force-displacement curve and figure of the twelve virtual tests, summary table |
-| `results/verification/` | Block 9 | Tables T01 to T09, figures F01 and F02 |
-| `results/thesis_figures/` | Block 10 | Figures F10_xx by topic, tables T10_xx as CSV, Markdown and LaTeX, and `figure_captions.md` |
-| `results/sector_tests/` | `experimental_compression.ipynb` | Figures F_EXP_xx, tables T_EXP_xx, Table 5.13.1 |
-| `results/report_check.csv` | Block 10 | Each compared value: computed, printed in the thesis, and whether they agree |
-
-[`docs/report_traceability.md`](docs/report_traceability.md) maps each figure and table of the thesis to the notebook and file that produce it.
-
-### How the stored run was verified
+## Verification
 
 All the searches and virtual tests were run again from scratch with this consolidated code, and the results were compared with the run behind the thesis:
 
@@ -145,7 +166,10 @@ All the searches and virtual tests were run again from scratch with this consoli
 
 These checks show that the code reproduces the numbers of the thesis. They do not validate the assumed loads and supports or the material model, whose limitations are discussed in Sections 1.7, 4.8 and 5.13 of the thesis.
 
-### Applying the framework to another part
+<details>
+<summary><strong>Applying the framework to another part</strong></summary>
+
+<br>
 
 The formulation is general for a solid of revolution made of a transversely isotropic material under axisymmetric supports and loads. These inputs are specific to this component:
 
@@ -160,7 +184,12 @@ The formulation is general for a solid of revolution made of a transversely isot
 
 Blocks 9 and 10 and the final check are written for this component's designs, and their reference values would need to be replaced.
 
-## Data notes
+</details>
+
+<details>
+<summary><strong>Data notes</strong></summary>
+
+<br>
 
 - **Thesis values prevail.** The model uses the constants of Table 4.4.1. The current reduction of the coupon tests gives compressive yield strengths of 53.30 and 25.80 MPa, against the 53.29 and 25.84 MPa adopted in the thesis, which come from an earlier iteration of the reduction. The difference does not exceed 0.15 %, and no selected design is governed by stress.
 - **Yield strength of PA6 in compression.** Three of the five prisms have no crossing with the 0.2 % offset line, and the reduction uses the 80th percentile of their stress record. `material_characterization.ipynb` identifies them.
@@ -170,7 +199,11 @@ Blocks 9 and 10 and the final check are written for this component's designs, an
 
 The assumptions behind the results, such as the assumed loads and supports and the elastic and homogenized material model, are listed in Sections 1.7 and 4.8 of the thesis.
 
+</details>
+
 ## Citation
+
+GitHub's *Cite this repository* button uses [`CITATION.cff`](CITATION.cff). In BibTeX:
 
 ```bibtex
 @thesis{londono2026topology,

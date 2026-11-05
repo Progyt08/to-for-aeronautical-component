@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the thesis."
+title: "Topology Optimization Framework for Solids of Revolution"
+type: software
+authors:
+  - family-names: "Londoño Palacio"
+    given-names: "Fernando"
+license: MIT
+repository-code: "https://github.com/Progyt08/to-for-aeronautical-component"
+preferred-citation:
+  type: thesis
+  thesis-type: "Undergraduate thesis"
+  title: "Topological Structural Optimization Framework for Solids of Revolution Applied to an Aeronautical Component"
+  authors:
+    - family-names: "Londoño Palacio"
+      given-names: "Fernando"
+  institution:
+    name: "EAFIT University"
+  year: 2026
+  url: "https://github.com/Progyt08/to-for-aeronautical-component"
